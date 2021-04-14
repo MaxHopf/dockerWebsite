@@ -1,0 +1,96 @@
+version: '3.3'
+services:
+
+    nginx-proxy:
+        image: jwilder/nginx-proxy
+        container_name: nginx-proxy
+        networks: 
+            - dockerwp
+        ports:
+            - '80:80'
+            - '443:443'
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+            - ./nginx/certs:/etc/nginx/certs
+            - ./nginx/vhost.d:/etc/nginx/vhost.d
+            - ./nginx/html:/usr/share/nginx/html
+        labels:
+            - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+        restart: always
+
+    letsencrypt-nginx-proxy-companion:
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        container_name: letsencrypt-nginx-proxy-companion
+        networks: 
+            - dockerwp
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./nginx/certs:/etc/nginx/certs:rw
+            - ./nginx/vhost.d:/etc/nginx/vhost.d
+            - ./nginx/html:/usr/share/nginx/html
+        restart: always
+     
+    mariadb-1:
+        image: mariadb
+        container_name: mariadb_1
+        networks: 
+            - dockerwp
+        volumes:
+            - ./mariadb_1:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=<superSecretPassword>
+            - MYSQL_DATABASE=<db1>
+            - MYSQL_USER=<dbuser1>
+            - MYSQL_PASSWORD=<secretPassword>
+        restart: always
+    wordpress-1:
+        image: wordpress
+        container_name: wordpress_1
+        networks: 
+            - dockerwp
+        volumes:
+            - ./wordpress_1:/var/www/html
+            - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+        environment:
+            - WORDPRESS_DB_HOST=mariadb_1:3306
+            - WORDPRESS_DB_NAME=<db1>
+            - WORDPRESS_DB_USER=<dbuser1>
+            - WORDPRESS_DB_PASSWORD=<secretPassword>       
+            - VIRTUAL_HOST=<sub.domain.com>
+            - LETSENCRYPT_HOST=<sub.domain.com>
+            - LETSENCRYPT_EMAIL=<admin@mail.com>
+        restart: always
+
+    mariadb-2:
+        image: mariadb
+        container_name: mariadb_2
+        networks: 
+            - dockerwp
+        volumes:
+            - ./mariadb_2:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=<superSecretPassword>
+            - MYSQL_DATABASE=<db2>
+            - MYSQL_USER=<dbuser2>
+            - MYSQL_PASSWORD=<secretPassword>
+        restart: always
+    wordpress-2:
+        image: wordpress
+        container_name: wordpress_2
+        networks: 
+            - dockerwp
+        volumes:
+            - ./wordpress_2:/var/www/html
+            - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+        environment:
+            - WORDPRESS_DB_HOST=mariadb_2:3306
+            - WORDPRESS_DB_NAME=<db2>
+            - WORDPRESS_DB_USER=<dbuser2>
+            - WORDPRESS_DB_PASSWORD=<secretPassword>
+            - VIRTUAL_HOST=<sub2.domain.com>
+            - LETSENCRYPT_HOST=<sub2.domain.com>
+            - LETSENCRYPT_EMAIL=<admin@mail.com>
+        restart: always
+
+networks:
+    dockerwp:
