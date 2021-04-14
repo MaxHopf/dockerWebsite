@@ -1,3 +1,4 @@
+## Almost ready to run setup. You only have to add your own domains to get this setup to run
 version: '3.3'
 services:
 
@@ -38,10 +39,10 @@ services:
         volumes:
             - ./mariadb_1:/var/lib/mysql
         environment:
-            - MYSQL_ROOT_PASSWORD=<superSecretPassword>
-            - MYSQL_DATABASE=<db1>
-            - MYSQL_USER=<dbuser1>
-            - MYSQL_PASSWORD=<secretPassword>
+            - MYSQL_ROOT_PASSWORD=superPassword     # change essential for security !!!
+            - MYSQL_DATABASE=db1
+            - MYSQL_USER=dbuser1
+            - MYSQL_PASSWORD=dbuser1Password        # change essential for security !!!
         restart: always
     wordpress-1:
         image: wordpress
@@ -53,44 +54,46 @@ services:
             - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
         environment:
             - WORDPRESS_DB_HOST=mariadb_1:3306
-            - WORDPRESS_DB_NAME=<db1>
-            - WORDPRESS_DB_USER=<dbuser1>
-            - WORDPRESS_DB_PASSWORD=<secretPassword>       
-            - VIRTUAL_HOST=<sub.domain.com>
-            - LETSENCRYPT_HOST=<sub.domain.com>
-            - LETSENCRYPT_EMAIL=<admin@mail.com>
+            - WORDPRESS_DB_NAME=db1
+            - WORDPRESS_DB_USER=dbuser1
+            - WORDPRESS_DB_PASSWORD=dbuser1Password # change essential for security !!!    
+            - VIRTUAL_HOST=<sub.domain.com>         # change essential to run !!!! Ofcause you can also use only <domain.com>
+            - LETSENCRYPT_HOST=<sub.domain.com>     # change essential to run !!!! Ofcause you can also use only <domain.com>
+            - LETSENCRYPT_EMAIL=<admin@mail.com>    # change essential to run !!!!
         restart: always
 
-    mariadb-2:
-        image: mariadb
-        container_name: mariadb_2
-        networks: 
-            - dockerwp
-        volumes:
-            - ./mariadb_2:/var/lib/mysql
-        environment:
-            - MYSQL_ROOT_PASSWORD=<superSecretPassword>
-            - MYSQL_DATABASE=<db2>
-            - MYSQL_USER=<dbuser2>
-            - MYSQL_PASSWORD=<secretPassword>
-        restart: always
-    wordpress-2:
-        image: wordpress
-        container_name: wordpress_2
-        networks: 
-            - dockerwp
-        volumes:
-            - ./wordpress_2:/var/www/html
-            - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
-        environment:
-            - WORDPRESS_DB_HOST=mariadb_2:3306
-            - WORDPRESS_DB_NAME=<db2>
-            - WORDPRESS_DB_USER=<dbuser2>
-            - WORDPRESS_DB_PASSWORD=<secretPassword>
-            - VIRTUAL_HOST=<sub2.domain.com>
-            - LETSENCRYPT_HOST=<sub2.domain.com>
-            - LETSENCRYPT_EMAIL=<admin@mail.com>
-        restart: always
+## Optional: Remove the '#' on the first column to run multiple docker instances side by side
+#    mariadb-2:
+#        image: mariadb
+#        container_name: mariadb_2
+#        networks: 
+#            - dockerwp
+#        volumes:
+#            - ./mariadb_2:/var/lib/mysql
+#        environment:
+#            - MYSQL_ROOT_PASSWORD=superPassword     # change essential for security !!!
+#            - MYSQL_DATABASE=<db2>
+#            - MYSQL_USER=<dbuser2>
+#            - MYSQL_PASSWORD=dbuser2Password        # change essential for security !!!
+#        restart: always
+#    wordpress-2:
+#        image: wordpress
+#        container_name: wordpress_2
+#        networks: 
+#            - dockerwp
+#        volumes:
+#            - ./wordpress_2:/var/www/html
+#            - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+#        environment:
+#            - WORDPRESS_DB_HOST=mariadb_2:3306
+#            - WORDPRESS_DB_NAME=<db2>
+#            - WORDPRESS_DB_USER=<dbuser2>
+#            - WORDPRESS_DB_PASSWORD=dbuser1Password # change essential for security !!!    
+#            - VIRTUAL_HOST=<sub2.domain.com>        # change essential to run !!!! Ofcause you can also use only <domain.com>
+#            - LETSENCRYPT_HOST=<sub2.domain.com>    # change essential to run !!!! Ofcause you can also use only <domain.com>
+#            - LETSENCRYPT_EMAIL=<admin@mail.com>    # change essential to run !!!!
+#        restart: always
+## Optional: You can run even more WordPress instances by extenting this file with the coresponding MariaDB and WordPress images.  
 
 networks:
     dockerwp:
